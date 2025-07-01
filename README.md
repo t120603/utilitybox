@@ -171,4 +171,30 @@ for z in range(sizeZ):
 imf.saveMutiPNG2GIF(tilesdir, os.path.join(tilefolder, f'tile_{tx}_{ty}.gif'))
 ```
 
+### Analyze metadata of multiple layers of .med/.aix files for cell comparison  
+** [INPUT] **   
+`aixpath`: folder containing multiple layers of .med/.aix files  
+[Note]  
+It's better to contain same number of .med files for retrieving med metadata and cropping cell tiles   
+***Example***  
+``` python
+import os, glob
+import aixfuncs as af
+import medfuncs as mf
+import csvfuncs as cf
+import auxfuncs as aux
 
+aixpath = r'd:\workfolder\cell-comparison\UCSF002'
+# get mpp from med file
+medlist = glob.glob(f'{aixpath}\\*.med')
+if len(medlist) == 0:
+    aux.printmsg(f'[WARNING] {wsifolder} does not contain any .med file, can not get MPP data')
+    thismpp = 0.25
+else:
+    meddata = mf.getMetadataFromMED(medlist[0])
+    thismpp = meddata['MPP']
+##
+cf.processAIXmetadata(aixpath, len(medlist), thismpp)
+##
+cf.analyzeCellsCoverage(os.path.join(aixpath, 'csvfiles'))
+```
